@@ -31,12 +31,6 @@ export class GameScene extends Phaser.Scene {
 
     update(time, delta) {
 
-        // first declare the ground layer tile as 0
-        // to utilize the alpha channel
-
-        let x = null
-        let y = null
-
         if (this.input.activePointer.justDown) {
             let initialPoint = this.input.activePointer.positionToCamera(this.cameras.main)
             if (!p1) {
@@ -50,6 +44,8 @@ export class GameScene extends Phaser.Scene {
         }
 
         if (p1) {
+            // declare the ground layer tile as 0
+            // to utilize the alpha channel
             map.forEachTile(function (tile) {
                 tile.index = 0
             });
