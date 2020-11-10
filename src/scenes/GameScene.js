@@ -10,6 +10,8 @@ let groundLayer = null
 let layer = null
 let newStaticLayer = null
 
+import { IdleTileState, PressedState, CreateTileState } from '../classes/State'
+
 export class GameScene extends Phaser.Scene {
     constructor() {
         super('Game')
@@ -26,6 +28,11 @@ export class GameScene extends Phaser.Scene {
         map.setCollisionByExclusion(7);
 
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
+        this.createTileStateMachine = new StateMachine('idle', {
+            idle: new IdleTileState(),
+            pressed: new PressedState(),
+            create: new CreateTileState(),
+        }, [this])
     }
 
     update(time, delta) {
@@ -33,12 +40,19 @@ export class GameScene extends Phaser.Scene {
         let pointer = this.input.activePointer
         if (pointer.justDown) {
             firstPoint = this.input.activePointer.positionToCamera(this.cameras.main)
+            // if (!p1) {
+            //     p1 = firstPoint.clone()
+            // }
+            // else if (!p2) {
+            //     p2 = firstPoint.clone()
+
             if (!p1) {
                 p1 = firstPoint.clone()
-            }
-            else if (!p2) {
+            } else if (!p2) {
                 p2 = firstPoint.clone()
-
+            } else {
+                p1 = firstPoint.clone()
+                p2 = null
             }
             console.log(p1, p2);
         }
@@ -79,8 +93,8 @@ export class GameScene extends Phaser.Scene {
             console.log(newStaticLayer);
             // disable this conditional, to stop from looping
             p2 = false
-            p1 = false
-            pointer.enabled = false
+ 
+
         }
 
 

@@ -11,189 +11,130 @@ class State {
     }
 }
 
-var onlyColliding = false;
-
-let p1 = null;
-let p2 = null;
-
-let imageButton
-
 export class IdleTileState extends State {
     enter(scene) {
         console.log("IDLE_TILE_STATE");
-
-        imageButton = scene.add.image(20, 20, '')
-        imageButton.setInteractive()
     }
 
     execute(scene) {
-        imageButton.on('pointerdown', () => {
-            setTimeout(() => {
-                this.stateMachine.transition('create')
-
-            }, 20)
-        })
-
     }
 }
 
+export class PressedState extends State {
+    enter(scene) {
+        console.log("PRESSED_STATE");
+    }
 
+    execute(scene) {
+    }
+}
 
 export class CreateTileState extends State {
-    enter(scene, map) {
+    enter(scene) {
         console.log("CREATE_TILE_STATE");
-
-
-
     }
 
-    execute(scene, map) {
-        // conditional for when mouse is pressed once
-        if (scene.input.activePointer.justDown) {
-
-            console.log("touched")
-
-            // locates the x and y of each mouse pressed
-            let worldPoint = scene.input.activePointer.positionToCamera(scene.cameras.main)
-
-            // console.log(worldPoint)
-
-            // conditionals for making two points
-            // using clone function 
-            if (!p1) {
-                p1 = worldPoint.clone()
-            } else if (!p2) {
-                p2 = worldPoint.clone()
-            } else {
-                p1 = worldPoint.clone()
-                p2 = null
-            }
-
-            console.log("point A: ", p1)
-            console.log("point B: ", p2)
-
-            if (p1 && p2) {
-
-                map.forEachTile((tile) => {
-                    tile.alpha = 1
-                })
-
-                let overlappingTiles = []
-
-                let xStart = Math.min(p1.x, p2.x)
-                let yStart = Math.min(p1.y, p2.y)
-                let xEnd = Math.max(p1.x, p2.x)
-                let yEnd = Math.max(p1.y, p2.y)
-
-                let rect = new Phaser.Geom.Rectangle(xStart, yStart, xEnd - xStart, yEnd - yStart)
-
-                overlappingTiles = map.getTilesWithinShape(rect, { isColliding: onlyColliding });
-                overlappingTiles.forEach((tile) => {
-                    tile.index = 2
-                })
-
-                this.stateMachine.transition('idle')
-            }
-        }
+    execute(scene) {
     }
 }
 
-    
-        let bootText = null
-        let splashText = null
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
 
+export class IdleState extends State {
+    enter(scene, entity) {
+        entity.anim = 0
 
+    }
 
-        export class IdleState extends State {
-            enter(scene, entity) {
-                entity.anim = 0
-
-            }
-
-            execute(scene) {
-                // setTimeout(this.stateMachine.transition('hostile'), 1000);
-                let callback = () => {
-                    this.stateMachine.transition('hostile')
-                }
-                scene.time.delayedCall(1000, callback)
-            }
+    execute(scene) {
+        // setTimeout(this.stateMachine.transition('hostile'), 1000);
+        let callback = () => {
+            this.stateMachine.transition('hostile')
         }
+        scene.time.delayedCall(1000, callback)
+    }
+}
 
-        export class HostileState extends State {
-            enter(scene, entity) {
-                entity.anim = 1
+export class HostileState extends State {
+    enter(scene, entity) {
+        entity.anim = 1
 
-            }
-            execute(scene) {
-                let callback = () => {
-                    this.stateMachine.transition('idle')
-                }
-                scene.time.delayedCall(1000, callback)
-            }
+    }
+    execute(scene) {
+        let callback = () => {
+            this.stateMachine.transition('idle')
         }
+        scene.time.delayedCall(1000, callback)
+    }
+}
 
-        export class BootState extends State {
-            enter(scene) {
-                // we "enter" the first state here
-                // all declared variables initial state eg. "sprite.anims.play('idle')"
-                console.log('State: Boot')
-                bootText = scene.add.text(40, 20, "Boot!")
-            }
+export class BootState extends State {
+    enter(scene) {
+        // we "enter" the first state here
+        // all declared variables initial state eg. "sprite.anims.play('idle')"
+        console.log('State: Boot')
+        bootText = scene.add.text(40, 20, "Boot!")
+    }
 
-            execute(scene) {
-                const { space } = scene.keys
-                if (Phaser.Input.Keyboard.JustDown(space)) {
-                    this.stateMachine.transition('splash')
-                    return;
-                }
-            }
-            // that which is to be executed to change state ex. "this.stateMachine.transition('move')"
-            // use an if statement ("if(keys.Z.isDown ){ this.stateMachine }")        
-            // text2.on('pointerdown', () => {
-            // this.stateMachine.transition('optionmenu')
-            // console.log('state: options')
-            // })
+    execute(scene) {
+        const { space } = scene.keys
+        if (Phaser.Input.Keyboard.JustDown(space)) {
+            this.stateMachine.transition('splash')
+            return;
         }
-        export class SplashState extends State {
-            enter(scene) {
-                console.log('State: Splash')
-                bootText.destroy();
-                splashText = scene.add.text(40, 20, "Splash!")
+    }
+    // that which is to be executed to change state ex. "this.stateMachine.transition('move')"
+    // use an if statement ("if(keys.Z.isDown ){ this.stateMachine }")        
+    // text2.on('pointerdown', () => {
+    // this.stateMachine.transition('optionmenu')
+    // console.log('state: options')
+    // })
+}
+export class SplashState extends State {
+    enter(scene) {
+        console.log('State: Splash')
+        bootText.destroy();
+        splashText = scene.add.text(40, 20, "Splash!")
 
-            }
+    }
 
-            execute(scene) {
-                const { space } = scene.keys
+    execute(scene) {
+        const { space } = scene.keys
 
-                // as before, we "enter" the state here
-                // all declared variables initial state ex. (if not )
-                // Transition to idle if not pressing movement keys
+        // as before, we "enter" the state here
+        // all declared variables initial state ex. (if not )
+        // Transition to idle if not pressing movement keys
 
-                // if (!(up.isDown || down.isDown)) {
-                //     this.stateMachine.transition('idle');
-                //     return;
-                //   }
-                // if (up.isDown) {
-                // } else if (down.isDown) {
-                //   }
-                //   sprite.anims.play('walk', true);
-                // text6.on('pointerdown', () => {
-                //     this.stateMachine.transition('menu')
-                // })
-                if (Phaser.Input.Keyboard.JustDown(space)) {
-                    this.stateMachine.transition("gamestate")
-                    return;
-                }
-            }
+        // if (!(up.isDown || down.isDown)) {
+        //     this.stateMachine.transition('idle');
+        //     return;
+        //   }
+        // if (up.isDown) {
+        // } else if (down.isDown) {
+        //   }
+        //   sprite.anims.play('walk', true);
+        // text6.on('pointerdown', () => {
+        //     this.stateMachine.transition('menu')
+        // })
+        if (Phaser.Input.Keyboard.JustDown(space)) {
+            this.stateMachine.transition("gamestate")
+            return;
         }
-        export class GameState extends State {
-            enter(scene, gameStart) {
-                gameStart.start("Title")
-                console.log('State: Title')
-            }
-            execute(scene, gameStart) {
-            }
-        }
+    }
+}
+export class GameState extends State {
+    enter(scene, gameStart) {
+        gameStart.start("Title")
+        console.log('State: Title')
+    }
+    execute(scene, gameStart) {
+    }
+}
 // For pausing the game and resuming that game
 // export class PlayState extends State {
 //     enter(scene) {
