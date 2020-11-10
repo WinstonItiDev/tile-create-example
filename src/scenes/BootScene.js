@@ -11,8 +11,7 @@ export class BootScene extends Phaser.Scene {
 
         // Holds all assets (sprites, sound)
         this.load.tilemapTiledJSON('map', 'assets/tilemaps/maps/cybernoid.json');
-        this.load.image('cybernoid', 'assets/tilemaps/tiles/cybernoid.png');
-        this.load.image('shovel', 'assets/ui/shovel.png')
+        this.load.image('cybernoid', 'assets/tilemaps/tiles/tiles.png');
 
     }
 
