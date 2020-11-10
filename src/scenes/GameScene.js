@@ -4,9 +4,11 @@ let p2 = null;
 let map = null;
 let overlappingTiles = [];
 let rect = null
-let worldPoint = null
-let layer = null
+let firstPoint = null
+let dragPoint = null
 let groundLayer = null
+let layer = null
+let newStaticLayer = null
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -24,23 +26,21 @@ export class GameScene extends Phaser.Scene {
         map.setCollisionByExclusion(7);
 
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
-
-        this.input.on('pointerdown', (pointer) => {
-        })
     }
 
     update(time, delta) {
 
-        if (this.input.activePointer.justDown) {
-            let initialPoint = this.input.activePointer.positionToCamera(this.cameras.main)
+        let pointer = this.input.activePointer
+        if (pointer.justDown) {
+            firstPoint = this.input.activePointer.positionToCamera(this.cameras.main)
             if (!p1) {
-                p1 = initialPoint.clone()
-            } else if (!p2) {
-                // clone
-            } else {
-                // has data
-                // null
+                p1 = firstPoint.clone()
             }
+            else if (!p2) {
+                p2 = firstPoint.clone()
+
+            }
+            console.log(p1, p2);
         }
 
         if (p1) {
@@ -50,43 +50,40 @@ export class GameScene extends Phaser.Scene {
                 tile.index = 0
             });
 
-            worldPoint = this.input.activePointer.positionToCamera(this.cameras.main)
+            dragPoint = this.input.activePointer.positionToCamera(this.cameras.main)
 
             // just like in the phaser 3 get tiles in shape example
             overlappingTiles = [];
 
-            let xStart = Math.min(p1.x - 5, worldPoint.x);
-            let yStart = Math.min(p1.y - 5, worldPoint.y);
-            let xEnd = Math.max(p1.x - 5, worldPoint.x);
-            let yEnd = Math.max(p1.y - 5, worldPoint.y);
+            let xStart = Math.min(p1.x - 5, dragPoint.x);
+            let yStart = Math.min(p1.y - 5, dragPoint.y);
+            let xEnd = Math.max(p1.x - 5, dragPoint.x);
+            let yEnd = Math.max(p1.y - 5, dragPoint.y);
 
             rect = new Phaser.Geom.Rectangle(xStart, yStart, xEnd - xStart, yEnd - yStart);
 
             overlappingTiles = map.getTilesWithinShape(rect, groundLayer)
 
-            // set tile index 
+            // set tile index to draw
             overlappingTiles.forEach((tile) => {
                 tile.index = 7
             })
         }
+        if (p2) {
+            // once triggered, convert dynamic layer to static layer
+            newStaticLayer = map.convertLayerToStatic(groundLayer)
+            // set scale to fit original dynamic layer
+            newStaticLayer.setScale(2, 2)
+            newStaticLayer.alpha = 0.2
+            // reads new static layer object
+            console.log(newStaticLayer);
+            // disable this conditional, to stop from looping
+            p2 = false
+            p1 = false
+        }
 
-        // map.removeTileAtWorldXY(worldPoint.x, worldPoint.y)
-        // if (this.input.activePointer.justDown) {
-        //     p1 = worldPoint.clone()
-        //     console.log(p1);
-            // xStart = Math.min(0, worldPoint.x);
-            // yStart = Math.min(0, worldPoint.y);
-            // xEnd = Math.max(worldPoint.x, worldPoint.x);
-            // yEnd = Math.max(worldPoint.y, worldPoint.y);
 
-        // if (!p1) {
-        //     p1 = worldPoint.clone()
-        // } else if (!p2) {
-        //     p2 = worldPoint.clone()
-        // } else {
-        //     p1 = worldPoint.clone()
-        //     p2 = null
-        // }
 
     }
 }
+
