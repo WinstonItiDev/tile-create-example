@@ -80,6 +80,7 @@ export class GameScene extends Phaser.Scene {
             // disable this conditional, to stop from looping
             p2 = false
             p1 = false
+            pointer.enabled = false
         }
 
 
