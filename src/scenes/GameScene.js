@@ -24,6 +24,7 @@ export class GameScene extends Phaser.Scene {
         tiles = map.addTilesetImage('cybernoid')
         groundLayer = map.createDynamicLayer(0, tiles);
         // layer = map.createDynamicLayer(1, tiles)
+        map.createDynamicLayer(1, tiles).setScale(2, 2)
         groundLayer.setScale(2, 2);
         // layer.setScale(2, 2);
 

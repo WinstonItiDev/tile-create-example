@@ -11,8 +11,8 @@ class State {
     }
 }
 
-// let rectTileButton = null
-// let dynamicLayer = null
+let activePoints = null
+let dynamicLayer = null
 
 export class IdleTileState extends State {
     enter(scene, map, tiles) {
@@ -21,7 +21,10 @@ export class IdleTileState extends State {
         this.rectTileButton.setInteractive()
         this.rectTileButton.on('pointerdown', (pointer) => {
             this.rectTileButton.disableInteractive();
+            activePoints = null
             
+            // dynamicLayer.setScale(2, 2)
+            // count = count + 1
             let callback = () => {
                 this.stateMachine.transition('pressed')
             }
@@ -37,22 +40,17 @@ export class IdleTileState extends State {
     }
 }
 
-let activePoints = null
+
 let dragPoint = null
 let p1, p2 = null
-let overlappingTiles = null
 let rect = null
-let count = 1
 
 export class PressedState extends State {
-    enter(scene, map, tiles) {
+    enter(scene) {
         console.log("PRESSED_STATE");
-        let dynamicLayer = map.createDynamicLayer(1, tiles)
-        this.newDynamicLayer = dynamicLayer 
-        this.newDynamicLayer.setScale(2, 2)
     }
 
-    execute(scene, map) {
+    execute(scene, map, layer) {
         let pointer = scene.input.activePointer
         if (pointer.justDown) {
             activePoints = scene.input.activePointer.positionToCamera(scene.cameras.main)
@@ -81,7 +79,7 @@ export class PressedState extends State {
 
             dragPoint = scene.input.activePointer.positionToCamera(scene.cameras.main)
 
-            overlappingTiles = []
+            let overlappingTiles = []
 
             let xStart = Math.min(p1.x - 5, dragPoint.x);
             let yStart = Math.min(p1.y - 5, dragPoint.y);
@@ -89,26 +87,35 @@ export class PressedState extends State {
             let yEnd = Math.max(p1.y - 5, dragPoint.y);
 
             rect = new Phaser.Geom.Rectangle(xStart, yStart, xEnd - xStart, yEnd - yStart);
-            overlappingTiles = map.getTilesWithinShape(rect, this.newDynamicLayer)
+            overlappingTiles = map.getTilesWithinShape(rect, 1)
 
             // set tile index to draw
             overlappingTiles.forEach((tile) => {
                 tile.index = 7
             })
 
-            if (p2 && p1) {
+            if (p2) {
                 // once triggered, convert dynamic layer to static layer
-                let newStaticLayer = map.convertLayerToStatic(this.newDynamicLayer)
+                // let newStaticLayer = map.convertLayerToStatic(1)
                 // set scale to fit original dynamic layer
-                newStaticLayer.setScale(2, 2)
+                // newStaticLayer.setScale(2, 2)
                 // newStaticLayer.alpha = 0.8
                 // console log new static layer object
-                console.log(newStaticLayer);
+                // console.log(newStaticLayer);
                 // disable this conditional, to stop from looping
                 p2 = false
                 p1 = false
-                this.stateMachine.transition('create')
 
+
+
+                // dynamicLayer.shutdown()
+
+
+                let callback = () => {
+
+                    this.stateMachine.transition('create')
+                }
+                scene.time.delayedCall(100, callback)
             }
         }
     }
@@ -117,14 +124,14 @@ export class PressedState extends State {
 export class CreateTileState extends State {
     enter(scene) {
         console.log("CREATE_TILE_STATE");
+
+    }
+
+    execute(scene) {
         let callback = () => {
             this.stateMachine.transition('idle')
         }
         scene.time.delayedCall(100, callback)
-    }
-
-    execute(scene) {
-
     }
 }
 
