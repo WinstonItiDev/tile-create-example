@@ -12,7 +12,7 @@ export class BootScene extends Phaser.Scene {
         // Holds all assets (sprites, sound)
         this.load.tilemapTiledJSON('map', 'assets/tilemaps/maps/cybernoid.json');
         this.load.image('cybernoid', 'assets/tilemaps/tiles/tiles.png');
-
+        this.load.spritesheet("press-button", "assets/ui/sprites-uiButtonSet.png",{ frameWidth: 64, frameHeight: 32 });
     }
 
     create() {
