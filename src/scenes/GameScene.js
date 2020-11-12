@@ -30,8 +30,8 @@ export class GameScene extends Phaser.Scene {
         offsetY = 16
 
         let buttonScaleX, buttonScaleY = null
-        buttonScaleX = 4
-        buttonScaleY = 4
+        buttonScaleX = 2
+        buttonScaleY = 2
 
         let buttonConfig = {
             scene: this,
@@ -39,26 +39,20 @@ export class GameScene extends Phaser.Scene {
             up: 0,
             over:1,
             down:2,
-            x: 0 + offsetX * buttonScaleX,
-            y: 0 + offsetY * buttonScaleY,
         }
 
         // create button
-        let button = new Button(buttonConfig)
+        let button = []
 
-
-        button.setScale(buttonScaleX, buttonScaleY)
-
-
-        button.on('pointerdown', this.onPressed, this)
-        // if (button.justDown) {
-        //     console.log();
-        // }
+        for (let i = 0; i < 7; i++) {
+            button[i] = new Button(buttonConfig)
+            button[i].x = 0 * i + offsetX * buttonScaleX
+            button[i].y = 70 * i + offsetY * buttonScaleY
+            button[i].setScale(buttonScaleX, buttonScaleY)
+            button[i].on('pointerdown', this.onPressed, this)
+        }
 
         map.setCollisionByExclusion(7);
-
-
-
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
     }
 
