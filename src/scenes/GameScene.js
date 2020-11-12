@@ -8,7 +8,6 @@ let firstPoint = null
 let dragPoint = null
 let groundLayer = null
 let layer = null
-let newStaticLayer = null
 
 export class GameScene extends Phaser.Scene {
     constructor() {
@@ -18,31 +17,28 @@ export class GameScene extends Phaser.Scene {
     create() {
         map = this.make.tilemap({ key: 'map' })
         let tiles = map.addTilesetImage('cybernoid')
-        layer = map.createDynamicLayer(0, tiles);
-        groundLayer = map.createDynamicLayer(1, tiles)
-        layer.setScale(2, 2);
+        groundLayer = map.createDynamicLayer(0, tiles)
         groundLayer.setScale(2, 2);
 
-        map.setCollisionByExclusion(7);
+        layer = map.createDynamicLayer(1, tiles)
+        layer.setScale(2, 2)
 
         this.cameras.main.setBounds(0, 0, map.widthInPixels, map.heightInPixels)
-    }
 
-    update(time, delta) {
-
-        let pointer = this.input.activePointer
-        if (pointer.justDown) {
+        this.input.on('pointerdown', () => {
             firstPoint = this.input.activePointer.positionToCamera(this.cameras.main)
             if (!p1) {
                 p1 = firstPoint.clone()
+                console.log(p1, p2);
             }
             else if (!p2) {
                 p2 = firstPoint.clone()
-
+                console.log(p1, p2);
             }
-            console.log(p1, p2);
-        }
+        })
+    }
 
+    update(time, delta) {
         if (p1) {
             // declare the ground layer tile as 0
             // to utilize the alpha channel
@@ -52,7 +48,6 @@ export class GameScene extends Phaser.Scene {
 
             dragPoint = this.input.activePointer.positionToCamera(this.cameras.main)
 
-            // just like in the phaser 3 get tiles in shape example
             overlappingTiles = [];
 
             let xStart = Math.min(p1.x - 5, dragPoint.x);
@@ -62,29 +57,24 @@ export class GameScene extends Phaser.Scene {
 
             rect = new Phaser.Geom.Rectangle(xStart, yStart, xEnd - xStart, yEnd - yStart);
 
-            overlappingTiles = map.getTilesWithinShape(rect, groundLayer)
+            overlappingTiles = map.getTilesWithinShape(rect, layer)
 
             // set tile index to draw
             overlappingTiles.forEach((tile) => {
                 tile.index = 7
             })
+
+            // console.log(rect.height);
+            // if (rect.width > 200) {
+            // let result = overlappingTiles.filter((result) => {
+            //     result > 5
+            // })
+            // }
         }
         if (p2) {
-            // once triggered, convert dynamic layer to static layer
-            newStaticLayer = map.convertLayerToStatic(groundLayer)
-            // set scale to fit original dynamic layer
-            newStaticLayer.setScale(2, 2)
-            newStaticLayer.alpha = 0.2
-            // reads new static layer object
-            console.log(newStaticLayer);
-            // disable this conditional, to stop from looping
             p2 = false
             p1 = false
-            pointer.enabled = false
         }
-
-
-
     }
 }
 
